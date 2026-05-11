@@ -5,6 +5,7 @@ import SearchBar from '../components/SearchBar'
 import { useAppContext } from '../context/useAppContext'
 import { workshops as fallbackWorkshops } from '../data/items'
 import { getWorkshops } from '../services/api'
+import { mergeItemsById } from '../utils/mergeItems'
 
 function Workshops() {
   const { searchTerm, selectedCategory } = useAppContext()
@@ -22,7 +23,7 @@ function Workshops() {
         const apiWorkshops = await getWorkshops()
 
         if (isMounted) {
-          setWorkshops(apiWorkshops)
+          setWorkshops(mergeItemsById(apiWorkshops, fallbackWorkshops))
         }
       } catch {
         if (isMounted) {

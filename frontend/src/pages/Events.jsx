@@ -6,6 +6,7 @@ import WeatherWidget from '../components/WeatherWidget'
 import { useAppContext } from '../context/useAppContext'
 import { events as fallbackEvents } from '../data/items'
 import { getEvents } from '../services/api'
+import { mergeItemsById } from '../utils/mergeItems'
 
 function Events() {
   const { searchTerm, selectedCategory } = useAppContext()
@@ -23,7 +24,7 @@ function Events() {
         const apiEvents = await getEvents()
 
         if (isMounted) {
-          setEvents(apiEvents)
+          setEvents(mergeItemsById(apiEvents, fallbackEvents))
         }
       } catch {
         if (isMounted) {
