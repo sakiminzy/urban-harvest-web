@@ -36,8 +36,9 @@ export default defineConfig({
         ],
       },
       workbox: {
-        navigateFallback: '/offline.html',
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,jpg,jpeg}'],
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api\//],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,jpg,jpeg,json,webmanifest}'],
         runtimeCaching: [
           {
             urlPattern: ({ request }) => request.destination === 'script' || request.destination === 'style',
@@ -58,12 +59,14 @@ export default defineConfig({
             },
           },
           {
-            urlPattern: ({ url, request }) =>
-              request.method === 'GET' &&
-              url.origin === 'http://localhost:5000' &&
-              ['/api/products', '/api/events', '/api/workshops'].some((path) =>
-                url.pathname.startsWith(path),
-              ),
+            urlPattern: ({ url, request }) => {
+              const cacheableApiPaths = ['/api/products', '/api/events', '/api/workshops']
+
+              return (
+                request.method === 'GET' &&
+                cacheableApiPaths.some((path) => url.pathname.startsWith(path))
+              )
+            },
             handler: 'NetworkFirst',
             options: {
               cacheName: 'urban-harvest-api',

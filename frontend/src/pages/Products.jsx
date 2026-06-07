@@ -5,6 +5,7 @@ import SearchBar from '../components/SearchBar'
 import { useAppContext } from '../context/useAppContext'
 import { products as fallbackProducts } from '../data/items'
 import { getProducts } from '../services/api'
+import { mergeItemsById } from '../utils/mergeItems'
 
 function Products() {
   const { searchTerm, selectedCategory } = useAppContext()
@@ -22,7 +23,7 @@ function Products() {
         const apiProducts = await getProducts()
 
         if (isMounted) {
-          setProducts(apiProducts)
+          setProducts(mergeItemsById(apiProducts, fallbackProducts))
         }
       } catch {
         if (isMounted) {

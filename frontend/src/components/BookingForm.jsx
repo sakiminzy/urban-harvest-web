@@ -31,6 +31,19 @@ function BookingForm() {
     setApiError('')
   }
 
+  const handleItemChange = (itemId) => {
+    const nextItem = bookableItems.find((item) => item.id === itemId)
+
+    setFormData((current) => ({
+      ...current,
+      itemId,
+      bookingDateTime: nextItem?.date ? `${nextItem.date}T10:00` : '',
+    }))
+    setErrors((current) => ({ ...current, itemId: '', bookingDateTime: '' }))
+    setSuccessMessage('')
+    setApiError('')
+  }
+
   const validate = () => {
     const nextErrors = {}
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -52,7 +65,7 @@ function BookingForm() {
     if (!formData.bookingDateTime) {
       nextErrors.bookingDateTime = 'Please choose a booking date and time.'
     } else if (selectedItem?.date && formData.bookingDateTime.slice(0, 10) !== selectedItem.date) {
-      nextErrors.bookingDateTime = `Please choose a time on ${selectedItem.date} for this session.`
+      nextErrors.bookingDateTime = `This session is on ${selectedItem.date}. Please choose a time on that date.`
     }
 
     if (!formData.participants || Number(formData.participants) < 1) {
@@ -90,7 +103,7 @@ function BookingForm() {
         setFormData(initialForm)
       } catch {
         addBooking(bookingPayload)
-        setApiError('Booking could not be saved to the backend. It was kept locally for this session.')
+        setApiError('Booking saving is unavailable while the backend is offline. This request was kept locally for this session.')
       } finally {
         setIsSubmitting(false)
       }
@@ -142,7 +155,7 @@ function BookingForm() {
         <select
           id="booking-item"
           value={formData.itemId}
-          onChange={(event) => updateField('itemId', event.target.value)}
+          onChange={(event) => handleItemChange(event.target.value)}
           className="form-field"
           aria-describedby={errors.itemId ? 'booking-item-error' : 'booking-item-help'}
           aria-invalid={Boolean(errors.itemId)}
@@ -173,10 +186,13 @@ function BookingForm() {
           className="form-field"
           aria-describedby={errors.bookingDateTime ? 'booking-date-time-error' : 'booking-date-time-help'}
           aria-invalid={Boolean(errors.bookingDateTime)}
+          min={selectedItem?.date ? `${selectedItem.date}T00:00` : undefined}
+          max={selectedItem?.date ? `${selectedItem.date}T23:59` : undefined}
+          disabled={!selectedItem}
         />
         <p id="booking-date-time-help" className="mt-2 text-sm text-slate-500 dark:text-slate-400">
           {selectedItem?.date
-            ? `This session is scheduled for ${selectedItem.date}.`
+            ? `This session is scheduled for ${selectedItem.date}. Choose a time on that date.`
             : 'Select a session first, then choose a matching date and time.'}
         </p>
         {errors.bookingDateTime && (
@@ -223,7 +239,7 @@ function BookingForm() {
       </div>
 
       <div className="flex flex-col gap-3 border-t border-slate-100 pt-5 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-slate-500 dark:text-slate-400">No backend is used. Requests are saved in React Context.</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">Bookings are saved to the backend when available.</p>
         <button type="submit" className="btn-primary w-full sm:w-auto" disabled={isSubmitting}>
           {isSubmitting ? 'Saving booking...' : 'Submit booking request'}
         </button>

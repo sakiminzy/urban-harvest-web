@@ -2,6 +2,10 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+## PWA Testing Note
+
+After changing service worker or PWA settings, unregister the existing browser service worker and clear site data before testing offline behavior again. Otherwise the browser may keep serving the old cached service worker.
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
