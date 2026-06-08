@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import ItemDetail from '../components/ItemDetail'
+import ReviewSection from '../components/ReviewSection'
+import { useAppContext } from '../context/useAppContext'
 import { events as fallbackEvents } from '../data/items'
 import { getEventById } from '../services/api'
 
 function EventDetail() {
+  const { t } = useAppContext()
   const { id } = useParams()
   const [event, setEvent] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -29,8 +32,8 @@ function EventDetail() {
           setEvent(fallbackEvent || null)
           setError(
             fallbackEvent
-              ? 'Backend unavailable. Showing local event details for now.'
-              : 'Event not found.',
+              ? t('offlineWarning')
+              : t('eventDetailsNotFound'),
           )
         }
       } finally {
@@ -45,13 +48,13 @@ function EventDetail() {
     return () => {
       isMounted = false
     }
-  }, [id])
+  }, [id, t])
 
   if (isLoading) {
     return (
       <section className="page-stack">
         <p className="app-panel text-slate-600 dark:text-slate-300" role="status">
-          Loading event details...
+          {t('loadingEvents')}
         </p>
       </section>
     )
@@ -60,9 +63,9 @@ function EventDetail() {
   if (!event) {
     return (
       <section className="page-stack">
-        <h1 className="page-title">Event not found</h1>
+        <h1 className="page-title">{t('eventDetailsNotFound')}</h1>
         <Link className="btn-secondary w-fit" to="/events">
-          Back to events
+          {t('backToEvents')}
         </Link>
       </section>
     )
@@ -75,7 +78,8 @@ function EventDetail() {
           {error}
         </p>
       )}
-      <ItemDetail item={event} backPath="/events" backLabel="Back to events" />
+      <ItemDetail item={event} backPath="/events" backLabel={t('backToEvents')} />
+      <ReviewSection itemType="event" itemId={id} itemTitle={event.title} />
     </section>
   )
 }

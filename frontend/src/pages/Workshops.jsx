@@ -8,7 +8,7 @@ import { getWorkshops } from '../services/api'
 import { mergeItemsById } from '../utils/mergeItems'
 
 function Workshops() {
-  const { searchTerm, selectedCategory } = useAppContext()
+  const { searchTerm, selectedCategory, t } = useAppContext()
   const [workshops, setWorkshops] = useState(fallbackWorkshops)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
@@ -28,7 +28,7 @@ function Workshops() {
       } catch {
         if (isMounted) {
           setWorkshops(fallbackWorkshops)
-          setError('Backend unavailable. Showing local workshop data for now.')
+          setError(t('offlineWarning'))
         }
       } finally {
         if (isMounted) {
@@ -42,7 +42,7 @@ function Workshops() {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [t])
 
   const categories = useMemo(
     () => [...new Set(workshops.map((workshop) => workshop.category))],
@@ -66,23 +66,18 @@ function Workshops() {
     <section className="page-stack" aria-labelledby="workshops-heading">
       <div>
         <p className="section-kicker">Skill building</p>
-        <h1 id="workshops-heading" className="mt-2 page-title">Workshops</h1>
-        <p className="page-copy mt-3">
-          Hands-on sessions for composting, container gardening, and resource-saving habits.
-        </p>
+        <h1 id="workshops-heading" className="mt-2 page-title">{t('workshopPageTitle')}</h1>
+        <p className="page-copy mt-3">{t('workshopPageCopy')}</p>
       </div>
 
       <div className="app-panel flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <SearchBar placeholder="Search workshops" />
-        <CategoryFilter
-          categories={categories}
-          label="Workshop category"
-        />
+        <SearchBar placeholder={t('searchWorkshops')} />
+        <CategoryFilter categories={categories} label={t('categoryLabelWorkshops')} />
       </div>
 
       {isLoading && (
         <p className="app-panel text-slate-600 dark:text-slate-300" role="status">
-          Loading workshops...
+          {t('loadingWorkshops')}
         </p>
       )}
 
@@ -100,7 +95,7 @@ function Workshops() {
         </div>
       ) : !isLoading ? (
         <p className="app-panel text-slate-600 dark:text-slate-300" role="status">
-          No workshops match your search.
+          {t('noMatches')}
         </p>
       ) : null}
     </section>

@@ -8,7 +8,7 @@ import { getProducts } from '../services/api'
 import { mergeItemsById } from '../utils/mergeItems'
 
 function Products() {
-  const { searchTerm, selectedCategory } = useAppContext()
+  const { searchTerm, selectedCategory, t } = useAppContext()
   const [products, setProducts] = useState(fallbackProducts)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
@@ -28,7 +28,7 @@ function Products() {
       } catch {
         if (isMounted) {
           setProducts(fallbackProducts)
-          setError('Backend unavailable. Showing local product data for now.')
+          setError(t('offlineWarning'))
         }
       } finally {
         if (isMounted) {
@@ -42,7 +42,7 @@ function Products() {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [t])
 
   const categories = useMemo(
     () => [...new Set(products.map((product) => product.category))],
@@ -66,23 +66,18 @@ function Products() {
     <section className="page-stack" aria-labelledby="products-heading">
       <div>
         <p className="section-kicker">Eco marketplace</p>
-        <h1 id="products-heading" className="mt-2 page-title">Products</h1>
-        <p className="page-copy mt-3">
-          Eco-friendly produce, garden supplies, and reusable essentials.
-        </p>
+        <h1 id="products-heading" className="mt-2 page-title">{t('productPageTitle')}</h1>
+        <p className="page-copy mt-3">{t('productPageCopy')}</p>
       </div>
 
       <div className="app-panel flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <SearchBar placeholder="Search products" />
-        <CategoryFilter
-          categories={categories}
-          label="Product category"
-        />
+        <SearchBar placeholder={t('searchProducts')} />
+        <CategoryFilter categories={categories} label={t('categoryLabelProducts')} />
       </div>
 
       {isLoading && (
         <p className="app-panel text-slate-600 dark:text-slate-300" role="status">
-          Loading products...
+          {t('loadingProducts')}
         </p>
       )}
 
@@ -100,7 +95,7 @@ function Products() {
         </div>
       ) : !isLoading ? (
         <p className="app-panel text-slate-600 dark:text-slate-300" role="status">
-          No products match your search.
+          {t('noMatches')}
         </p>
       ) : null}
     </section>

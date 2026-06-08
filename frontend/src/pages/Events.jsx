@@ -9,7 +9,7 @@ import { getEvents } from '../services/api'
 import { mergeItemsById } from '../utils/mergeItems'
 
 function Events() {
-  const { searchTerm, selectedCategory } = useAppContext()
+  const { searchTerm, selectedCategory, t } = useAppContext()
   const [events, setEvents] = useState(fallbackEvents)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
@@ -29,7 +29,7 @@ function Events() {
       } catch {
         if (isMounted) {
           setEvents(fallbackEvents)
-          setError('Backend unavailable. Showing local event data for now.')
+          setError(t('offlineWarning'))
         }
       } finally {
         if (isMounted) {
@@ -43,7 +43,7 @@ function Events() {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [t])
 
   const categories = useMemo(() => [...new Set(events.map((event) => event.category))], [events])
 
@@ -64,25 +64,20 @@ function Events() {
     <section className="page-stack" aria-labelledby="events-heading">
       <div>
         <p className="section-kicker">Community calendar</p>
-        <h1 id="events-heading" className="mt-2 page-title">Events</h1>
-        <p className="page-copy mt-3">
-          Community activities for local food sharing and urban sustainability.
-        </p>
+        <h1 id="events-heading" className="mt-2 page-title">{t('eventPageTitle')}</h1>
+        <p className="page-copy mt-3">{t('eventPageCopy')}</p>
       </div>
 
       <WeatherWidget />
 
       <div className="app-panel flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <SearchBar placeholder="Search events" />
-        <CategoryFilter
-          categories={categories}
-          label="Event category"
-        />
+        <SearchBar placeholder={t('searchEvents')} />
+        <CategoryFilter categories={categories} label={t('categoryLabelEvents')} />
       </div>
 
       {isLoading && (
         <p className="app-panel text-slate-600 dark:text-slate-300" role="status">
-          Loading events...
+          {t('loadingEvents')}
         </p>
       )}
 
@@ -100,7 +95,7 @@ function Events() {
         </div>
       ) : !isLoading ? (
         <p className="app-panel text-slate-600 dark:text-slate-300" role="status">
-          No events match your search.
+          {t('noMatches')}
         </p>
       ) : null}
     </section>

@@ -350,31 +350,63 @@ const workshops = [
 ]
 
 const insertProduct = db.prepare(`
-  INSERT INTO products (id, title, category, image, description, price, availability)
+  INSERT OR IGNORE INTO products (id, title, category, image, description, price, availability)
   VALUES (@id, @title, @category, @image, @description, @price, @availability)
 `)
 
 const insertEvent = db.prepare(`
-  INSERT INTO events (id, title, category, image, description, price, availability, date, location)
+  INSERT OR IGNORE INTO events (id, title, category, image, description, price, availability, date, location)
   VALUES (@id, @title, @category, @image, @description, @price, @availability, @date, @location)
 `)
 
 const insertWorkshop = db.prepare(`
-  INSERT INTO workshops (id, title, category, image, description, price, availability, date, location)
+  INSERT OR IGNORE INTO workshops (id, title, category, image, description, price, availability, date, location)
   VALUES (@id, @title, @category, @image, @description, @price, @availability, @date, @location)
 `)
 
-const seedDatabase = db.transaction(() => {
-  db.prepare('DELETE FROM bookings').run()
-  db.prepare('DELETE FROM products').run()
-  db.prepare('DELETE FROM events').run()
-  db.prepare('DELETE FROM workshops').run()
+function getCount(table) {
+  return db.prepare(`SELECT COUNT(*) AS count FROM ${table}`).get().count
+}
 
-  products.forEach((product) => insertProduct.run(product))
-  events.forEach((event) => insertEvent.run(event))
-  workshops.forEach((workshop) => insertWorkshop.run(workshop))
-})
+function seedCatalog({ reset = false } = {}) {
+  const seedDatabase = db.transaction(() => {
+    if (reset) {
+      db.prepare('DELETE FROM bookings').run()
+      db.prepare('DELETE FROM products').run()
+      db.prepare('DELETE FROM events').run()
+      db.prepare('DELETE FROM workshops').run()
+    }
 
-seedDatabase()
+    products.forEach((product) => insertProduct.run(product))
+    events.forEach((event) => insertEvent.run(event))
+    workshops.forEach((workshop) => insertWorkshop.run(workshop))
+  })
 
-console.log('SQLite database initialized with Urban Harvest Hub seed data.')
+  seedDatabase()
+}
+
+function seedCatalogIfEmpty() {
+  const beforeCount =
+    getCount('products') +
+    getCount('events') +
+    getCount('workshops')
+
+  seedCatalog()
+
+  const afterCount =
+    getCount('products') +
+    getCount('events') +
+    getCount('workshops')
+
+  return afterCount > beforeCount
+}
+
+if (require.main === module) {
+  seedCatalog({ reset: true })
+  console.log('SQLite database initialized with Urban Harvest Hub seed data.')
+}
+
+module.exports = {
+  seedCatalog,
+  seedCatalogIfEmpty,
+}

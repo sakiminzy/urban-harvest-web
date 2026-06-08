@@ -1,18 +1,19 @@
 import { Link } from 'react-router-dom'
 import NotificationPrompt from '../components/NotificationPrompt'
 import WeatherWidget from '../components/WeatherWidget'
+import { useAppContext } from '../context/useAppContext'
 
 const features = [
   {
-    title: 'Local produce',
+    titleKey: 'products',
     description: 'Fresh harvest boxes, herbs, and growing supplies from nearby urban growers.',
   },
   {
-    title: 'Community events',
+    titleKey: 'events',
     description: 'Markets, harvest days, and seed swaps that bring sustainable communities together.',
   },
   {
-    title: 'Practical workshops',
+    titleKey: 'workshops',
     description: 'Hands-on learning for composting, balcony gardening, and water-wise growing.',
   },
 ]
@@ -25,24 +26,20 @@ const benefits = [
 ]
 
 function Home() {
+  const { t } = useAppContext()
+
   return (
     <div className="page-stack">
       <section className="page-hero grid gap-10 overflow-hidden lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
         <div className="space-y-7">
-          <p className="section-kicker">
-            Premium sustainability marketplace
-          </p>
+          <p className="section-kicker">{t('sectionKickerHome')}</p>
           <h1 className="max-w-3xl text-5xl font-black leading-tight text-slate-950 dark:text-slate-50 sm:text-6xl">
-            Grow, gather, and shop sustainably in the city.
+            {t('homeHeroTitle')}
           </h1>
-          <p className="page-copy">
-            Urban Harvest Hub connects eco-conscious residents with fresh local
-            produce, community food events, and practical workshops for greener
-            everyday living.
-          </p>
+          <p className="page-copy">{t('homeHeroCopy')}</p>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Link className="btn-primary" to="/products">Explore Products</Link>
-            <Link className="btn-secondary" to="/booking">Book Workshop</Link>
+            <Link className="btn-primary" to="/products">{t('exploreProducts')}</Link>
+            <Link className="btn-secondary" to="/booking">{t('bookWorkshop')}</Link>
           </div>
         </div>
 
@@ -64,7 +61,7 @@ function Home() {
                 <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Tracks</p>
               </div>
               <div className="stat-card">
-                <p className="text-2xl font-black text-harvestGreen">0</p>
+                <p className="text-2xl font-black text-harvestGreen">1</p>
                 <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Backend</p>
               </div>
             </div>
@@ -74,9 +71,9 @@ function Home() {
 
       <section className="grid gap-5 md:grid-cols-3" aria-label="Urban Harvest Hub highlights">
         {features.map((feature) => (
-          <article key={feature.title} className="app-panel-soft transition duration-200 hover:-translate-y-1 hover:shadow-2xl">
+          <article key={feature.titleKey} className="app-panel-soft transition duration-200 hover:-translate-y-1 hover:shadow-2xl">
             <span className="badge">Featured</span>
-            <h2 className="mt-4 text-xl font-black text-slate-950 dark:text-slate-50">{feature.title}</h2>
+            <h2 className="mt-4 text-xl font-black text-slate-950 dark:text-slate-50">{t(feature.titleKey)}</h2>
             <p className="mt-3 leading-7 text-slate-600 dark:text-slate-300">
               {feature.description}
             </p>
@@ -88,7 +85,7 @@ function Home() {
         <div>
           <p className="section-kicker">Why Urban Harvest Hub?</p>
           <h2 className="mt-2 text-3xl font-black text-slate-950 dark:text-slate-50">
-            A cleaner way to discover local sustainability.
+            {t('whyTitle')}
           </h2>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">

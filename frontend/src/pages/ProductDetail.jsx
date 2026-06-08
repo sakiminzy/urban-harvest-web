@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import ItemDetail from '../components/ItemDetail'
+import ReviewSection from '../components/ReviewSection'
+import { useAppContext } from '../context/useAppContext'
 import { products as fallbackProducts } from '../data/items'
 import { getProductById } from '../services/api'
 
 function ProductDetail() {
+  const { t } = useAppContext()
   const { id } = useParams()
   const [product, setProduct] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -29,8 +32,8 @@ function ProductDetail() {
           setProduct(fallbackProduct || null)
           setError(
             fallbackProduct
-              ? 'Backend unavailable. Showing local product details for now.'
-              : 'Product not found.',
+              ? t('offlineWarning')
+              : t('productDetailsNotFound'),
           )
         }
       } finally {
@@ -45,13 +48,13 @@ function ProductDetail() {
     return () => {
       isMounted = false
     }
-  }, [id])
+  }, [id, t])
 
   if (isLoading) {
     return (
       <section className="page-stack">
         <p className="app-panel text-slate-600 dark:text-slate-300" role="status">
-          Loading product details...
+          {t('loadingProducts')}
         </p>
       </section>
     )
@@ -60,9 +63,9 @@ function ProductDetail() {
   if (!product) {
     return (
       <section className="page-stack">
-        <h1 className="page-title">Product not found</h1>
+        <h1 className="page-title">{t('productDetailsNotFound')}</h1>
         <Link className="btn-secondary w-fit" to="/products">
-          Back to products
+          {t('backToProducts')}
         </Link>
       </section>
     )
@@ -75,7 +78,8 @@ function ProductDetail() {
           {error}
         </p>
       )}
-      <ItemDetail item={product} backPath="/products" backLabel="Back to products" />
+      <ItemDetail item={product} backPath="/products" backLabel={t('backToProducts')} />
+      <ReviewSection itemType="product" itemId={id} itemTitle={product.title} />
     </section>
   )
 }

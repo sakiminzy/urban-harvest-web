@@ -37,7 +37,7 @@ export default defineConfig({
       },
       workbox: {
         navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/api\//],
+        navigateFallbackDenylist: [/^\/api/],
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,jpg,jpeg,json,webmanifest}'],
         runtimeCaching: [
           {
@@ -59,20 +59,28 @@ export default defineConfig({
             },
           },
           {
-            urlPattern: ({ url, request }) => {
-              const cacheableApiPaths = ['/api/products', '/api/events', '/api/workshops']
-
-              return (
-                request.method === 'GET' &&
-                cacheableApiPaths.some((path) => url.pathname.startsWith(path))
-              )
-            },
+            urlPattern: ({ url, request }) =>
+              request.method === 'GET' &&
+              ['/api/products', '/api/events', '/api/workshops', '/api/reviews', '/api/subscriptions', '/api/bookings'].some((path) =>
+                url.pathname.startsWith(path),
+              ),
             handler: 'NetworkFirst',
             options: {
               cacheName: 'urban-harvest-api',
               networkTimeoutSeconds: 4,
               expiration: {
-                maxEntries: 40,
+                maxEntries: 80,
+                maxAgeSeconds: 60 * 60 * 24,
+              },
+            },
+          },
+          {
+            urlPattern: ({ url }) => url.hostname.includes('openweathermap.org'),
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'urban-harvest-weather',
+              expiration: {
+                maxEntries: 30,
                 maxAgeSeconds: 60 * 60 * 24,
               },
             },

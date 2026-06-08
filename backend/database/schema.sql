@@ -46,3 +46,24 @@ CREATE TABLE IF NOT EXISTS bookings (
   notes TEXT,
   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS subscriptions (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  preference TEXT NOT NULL,
+  frequency TEXT NOT NULL,
+  notes TEXT,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS reviews (
+  id TEXT PRIMARY KEY,
+  reviewerName TEXT NOT NULL,
+  rating INTEGER NOT NULL,
+  comment TEXT NOT NULL,
+  itemType TEXT NOT NULL,
+  itemId TEXT NOT NULL,
+  itemTitle TEXT,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
